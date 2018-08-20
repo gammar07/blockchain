@@ -55,6 +55,40 @@ class Blockchain(object):
         return self.last_block['index'] +1
 
 
+    def proof_of_work(self, last_proof):
+        '''
+        Simple proof of work algorithm:
+        - find p' such that hash(pp') contains 4 leading 0s, where p is the previous proof,
+        and p' is the new proof
+
+        :param last_proof: <int>
+        :return: <int>
+        '''
+
+        proof = 0
+        while self.vaild_proof(last_proof, proof) is False:
+            proof +=1
+
+        return proof
+
+    
+    @staticmethod
+    def vaild_proof(last_proof, proof):
+        '''
+        validates the proof: does hash(last_proof, proof) contain 4 leading 0?
+
+        :param last_proof: <int> previous proof
+        :param proof: <int> current proof
+        :return: <bool> True if correct, false if not
+        '''
+
+        guess = f'{last_proof}{proof}'.encode()
+        guess_hash = hashlib.sha256(guess).hexdigest()
+        
+        return guess_hash[:4] == '0000'
+
+
+
     @staticmethod
     def hash(block):
         '''
