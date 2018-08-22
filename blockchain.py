@@ -4,7 +4,7 @@ from textwrap import dedent
 from time import time
 from uuid import uuid4
 
-from flask import Flask
+from flask import Flask, jsonify, request
 
 
 class Blockchain(object):
@@ -122,8 +122,32 @@ blockchain = Blockchain()
 
 @app.route('/mine', methods=['GET'])
 def mine():
-    return "We'll mine new block"
+    # Run the proof of work to get the next proof
 
+    last_block = blockchain.last_block
+    last_proof = last_block['proof']
+    proof = blockchain.proof_of_work(last_proof)
+
+    # Award for finding proof
+    # Sender is '0' to signify it has been mined
+    blockchain.new_transaction(
+        sender='0',
+        recipient=node_identifier,
+        amount=1
+    )
+
+    # Forge the new bock by addint it to a chain
+    previous_hash = blockchain.hash(last_block)
+    block = blockchain.new_block(proof, previous_hash)
+
+    response = {
+        'message': "New Block Forged",
+        'index': block['index'],
+        'transactions': block['transactions'],
+        'proof': block['proof'],
+        'previous_hash': block['previous_hash'],
+    }
+    return jsonify(response), 200
 @app.route('/transactions/new', methods=['POST'])
 def new_transaction():
     values = request.get_json()
