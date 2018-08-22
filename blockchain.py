@@ -148,14 +148,20 @@ def mine():
         'previous_hash': block['previous_hash'],
     }
     return jsonify(response), 200
+
+
 @app.route('/transactions/new', methods=['POST'])
 def new_transaction():
     values = request.get_json()
 
+    
+
     #Check that the fields are in the POST data
     required = ['sender', 'recipient', 'amount']
+    
     if not all (k in values for k in required):
         return 'Missing values', 400
+    
 
     # Create new transaction
     index = blockchain.new_transaction(values['sender'], values['recipient'], values['amount'])
@@ -166,7 +172,7 @@ def new_transaction():
 @app.route('/chain', methods=['GET'])
 def full_chain():
     response = {
-        'chian': blockchain.chain,
+        'chain': blockchain.chain,
         'length': len(blockchain.chain)
     }
     return jsonify(response), 200
@@ -174,3 +180,4 @@ def full_chain():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
+    
