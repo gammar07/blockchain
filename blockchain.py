@@ -116,11 +116,39 @@ class Blockchain(object):
     def register_node(self, address):
         """
         Add a new node to the list of nodes
-        :param address: <str> Address of node eg 'http://192.168.0.5.:5000'
+        :param address: <str> Address of node eg 'http://192.168.0.5:5000'
         :return: None
         """
         parsed_url = urlparse(address)
         self.nodes.add(parsed_url.netloc)
+
+
+    def valid_chain(self, chain):
+        """
+        determine of a given blockchain is valid
+
+        :param chain: <list> A blockchain
+        :return: <bool> True if valid, False if not
+        """
+
+        last_block = chain[0]
+        current_index = 1
+
+        while current_index < len(chain):
+            block = chain[current_index]
+
+            # Check that the hash of the block is correct
+            if block['previous_hash'] != self.hash(last_block):
+                return False
+
+            #Check that the proof of work is correct
+            if not self.vaild_proof(last_block['proof'], block['proof']):
+                return False
+
+            last_block = block
+            current_index +=1
+
+        return True
 
         
 
