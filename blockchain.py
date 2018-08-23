@@ -169,7 +169,7 @@ class Blockchain(object):
             response = requests.get(f'http://{node}/chain')
 
             if response.status_code == 200:
-                length = response.json().['length']
+                length = response.json()['length']
                 chain = response.json()['chain']
 
                 # Compare lenth of chains
@@ -270,7 +270,7 @@ def register_nodes():
     return jsonify(response), 201
 
 
-@app.route('nodes/resolve', methods=['GET')
+@app.route('/nodes/resolve', methods=['GET'])
 def consensus():
     replaced = blockchain.resolve_conflicts()
 
@@ -289,5 +289,5 @@ def consensus():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5001)
     
