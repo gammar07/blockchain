@@ -150,6 +150,39 @@ class Blockchain(object):
 
         return True
 
+
+    def resolve_conflicts(self):
+        """ Consensus algoritm, resolves conflicts be replacing our chain with the longest one
+        on the network.
+
+        :return: <bool> True if chain was replaced, False if not
+        """
+
+        neighbours = self.nodes
+        new_chain = None
+
+        # Only look for chain longer than our chain
+        max_length = len(self.chain)
+
+        # Grab the chains
+        for node in neighbours:
+            response = requests.get(f'http://{node}/chain')
+
+            if response.status_code == 200:
+                length = response.json().['length']
+                chain = response.json()['chain']
+
+                # Compare lenth of chains
+                if length > max_length and self.valid_chain(chain):
+                    max_length = length
+                    new_chain = chain
+
+            # Replace our chain if we discovered new, valid chain longer than ours
+            if new_chain:
+                self.chain = new_chain
+                return True
+
+            return False
         
 
 app = Flask(__name__)
